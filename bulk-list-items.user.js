@@ -5,7 +5,7 @@
 // @updateURL    https://raw.githubusercontent.com/WallCod/upland-bulk-list/master/bulk-list-items.user.js
 // @version      1.0.0
 // @description  Lista vários itens iguais na Showroom pelo mesmo preço, um de cada vez, sem precisar clicar manualmente em cada um
-// @author       Alpha
+// @author       WallCod
 // @match        https://play.upland.me/*
 // @grant        none
 // @run-at       document-idle
