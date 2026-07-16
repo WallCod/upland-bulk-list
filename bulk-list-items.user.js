@@ -1,6 +1,8 @@
 // ==UserScript==
 // @name         Upland Bulk List Items
-// @namespace    https://github.com/alpha/upland-bulk-list
+// @namespace    https://github.com/WallCod/upland-bulk-list
+// @downloadURL  https://raw.githubusercontent.com/WallCod/upland-bulk-list/master/bulk-list-items.user.js
+// @updateURL    https://raw.githubusercontent.com/WallCod/upland-bulk-list/master/bulk-list-items.user.js
 // @version      1.0.0
 // @description  Lista vários itens iguais na Showroom pelo mesmo preço, um de cada vez, sem precisar clicar manualmente em cada um
 // @author       Alpha
