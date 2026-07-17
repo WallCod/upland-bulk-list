@@ -435,6 +435,7 @@
   function showMessage(title, message) {
     return new Promise(resolve => {
       const { overlay, box } = createModalShell();
+      box.style.textAlign = 'center';
       const h = document.createElement('h3');
       h.textContent = title;
       Object.assign(h.style, { margin: '0 0 12px', fontSize: '16px' });
@@ -443,7 +444,11 @@
       Object.assign(p.style, { margin: '0 0 20px', fontSize: '14px', lineHeight: '1.5', whiteSpace: 'pre-line', color: '#c5c9d2' });
       const okBtn = modalButton('Got it', 'primary');
       okBtn.addEventListener('click', () => { overlay.remove(); resolve(); });
-      box.append(h, p, okBtn);
+      Object.assign(okBtn.style, { flex: '0 1 auto', minWidth: '120px' });
+      const btnRow = document.createElement('div');
+      Object.assign(btnRow.style, { display: 'flex', justifyContent: 'center' });
+      btnRow.appendChild(okBtn);
+      box.append(h, p, btnRow);
     });
   }
 
