@@ -667,11 +667,31 @@
       color: '#e4e6eb',
       border: '1px solid #2a2e37',
       borderRadius: '8px',
-      padding: '10px',
+      padding: '10px 26px 10px 10px',
       fontSize: '12px',
       fontFamily: 'monospace',
       display: 'none',
     });
+
+    const statusCloseBtn = document.createElement('button');
+    statusCloseBtn.textContent = '×';
+    statusCloseBtn.title = 'Close';
+    Object.assign(statusCloseBtn.style, {
+      position: 'absolute', top: '4px', right: '6px',
+      background: 'transparent', border: 'none', color: '#9aa0ac',
+      fontSize: '16px', lineHeight: '1', cursor: 'pointer', padding: '4px',
+    });
+    statusCloseBtn.addEventListener('mouseenter', () => { statusCloseBtn.style.color = '#e4e6eb'; });
+    statusCloseBtn.addEventListener('mouseleave', () => { statusCloseBtn.style.color = '#9aa0ac'; });
+    statusCloseBtn.addEventListener('click', () => { status.style.display = 'none'; });
+    status.style.position = 'fixed';
+    status.appendChild(statusCloseBtn);
+
+    function clearStatusLines() {
+      Array.from(status.children).forEach(child => {
+        if (child !== statusCloseBtn) child.remove();
+      });
+    }
 
     function log(msg) {
       recordLogLine(msg);
@@ -692,7 +712,7 @@
 
       menuBtn.disabled = true;
       menuBtn.textContent = 'Checking...';
-      status.innerHTML = '';
+      clearStatusLines();
       status.style.display = 'block';
       status.appendChild(Object.assign(document.createElement('div'), { textContent: `Looking for "${itemName}" in the Showroom...` }));
 
@@ -727,7 +747,7 @@
         return;
       }
 
-      status.innerHTML = '';
+      clearStatusLines();
       menuBtn.textContent = 'Listing...';
       try {
         const { done, skipped } = await runBulkListing(itemName, price, quantity, log);
