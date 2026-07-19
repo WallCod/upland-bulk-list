@@ -3,7 +3,7 @@
 // @namespace    https://github.com/WallCod/upland-bulk-list
 // @downloadURL  https://raw.githubusercontent.com/WallCod/upland-bulk-list/master/bulk-list-items.user.js
 // @updateURL    https://raw.githubusercontent.com/WallCod/upland-bulk-list/master/bulk-list-items.user.js
-// @version      1.1.0
+// @version      1.1.2
 // @description  Bulk-list identical items in the Showroom at the same price, one at a time, without clicking through each unit manually.
 // @author       WallCod
 // @match        https://play.upland.me/*
