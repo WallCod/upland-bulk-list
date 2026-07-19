@@ -3,7 +3,7 @@
 // @namespace    https://github.com/WallCod/upland-bulk-list
 // @downloadURL  https://raw.githubusercontent.com/WallCod/upland-bulk-list/master/bulk-list-items.user.js
 // @updateURL    https://raw.githubusercontent.com/WallCod/upland-bulk-list/master/bulk-list-items.user.js
-// @version      1.1.2
+// @version      1.2.0
 // @description  Bulk-list identical items in the Showroom at the same price, one at a time, without clicking through each unit manually.
 // @author       WallCod
 // @match        https://play.upland.me/*
@@ -33,7 +33,7 @@
   // backend parar de mostrar o item como disponível na lista. Se reabrirmos
   // rápido demais, o item aparece "fantasma" (ainda visível mas já vendido)
   // e o clique nele falha silenciosamente. Esperamos esse tempo antes de
-  // reabrir "List my map assets" para o próximo item.
+  // reabrir a lista ("List my ...") para o próximo item.
   const CONFIRMATION_DELAY_MS = 12000;
 
   const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -86,6 +86,15 @@
     const needle = text.trim().toLowerCase();
     return [...document.querySelectorAll(selector)].find(
       el => el.textContent.trim().toLowerCase() === needle && isVisible(el)
+    );
+  }
+
+  // Diferentes Showrooms (map assets, structure ornaments, NFL, futebol,
+  // etc.) usam o mesmo botão de abrir a lista, mas com texto diferente:
+  // sempre "List my <categoria>". Casa pelo prefixo em vez de texto exato.
+  function findListMyButton(selector) {
+    return [...document.querySelectorAll(selector)].find(
+      el => el.textContent.trim().toLowerCase().startsWith('list my ') && isVisible(el)
     );
   }
 
@@ -176,18 +185,19 @@
     // 0. Garantir que a lista de itens está aberta (pode estar na tela
     // inicial da Showroom se este não é o primeiro item da rodada). A
     // navegação de volta para a Showroom após fechar a tela de sucesso nem
-    // sempre é imediata, então esperamos "List my map assets" aparecer em
-    // vez de checar uma única vez e desistir.
+    // sempre é imediata, então esperamos o botão "List my ..." aparecer em
+    // vez de checar uma única vez e desistir. O texto do botão varia por
+    // categoria (map assets, structure ornaments, NFL, futebol, etc.).
     log('  [debug] looking for the item in the current list...');
     let found = await searchAndFindItem(itemName, log, skipMints);
     if (!found) {
-      log('  [debug] not found, waiting for "List my map assets" to appear...');
-      const listAssetsBtn = await waitFor(() => findByText('button', 'List my map assets'));
+      log('  [debug] not found, waiting for "List my ..." button to appear...');
+      const listAssetsBtn = await waitFor(() => findListMyButton('button'));
       if (listAssetsBtn) {
         listAssetsBtn.click();
         await sleep(STEP_DELAY_MS);
       } else {
-        log(`  [debug] "List my map assets" never showed up. Current URL: ${location.href}`);
+        log(`  [debug] "List my ..." button never showed up. Current URL: ${location.href}`);
       }
       found = await searchAndFindItem(itemName, log, skipMints);
     }
@@ -252,7 +262,7 @@
       await sleep(STEP_DELAY_MS);
 
       // Fechar a tela de erro não volta para a Showroom inicial — fica na
-      // tela de detalhe do item (sem "List my map assets"). Usa o botão de
+      // tela de detalhe do item (sem o botão "List my ..."). Usa o botão de
       // voltar explicitamente para garantir que a próxima tentativa comece
       // de um estado conhecido.
       const backBtn = await waitFor(() => queryVisible('button[aria-label="goBackButton"]'), 5000);
@@ -285,7 +295,7 @@
   // (via busca), para avisar o usuário antes de gastar tempo/gás tentando
   // listar algo que não existe ou que não tem unidades suficientes.
   async function checkItemAvailability(itemName) {
-    let listAssetsBtn = findByText('button', 'List my map assets');
+    let listAssetsBtn = findListMyButton('button');
     if (listAssetsBtn) {
       listAssetsBtn.click();
       await sleep(STEP_DELAY_MS);
