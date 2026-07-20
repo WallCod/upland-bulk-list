@@ -2,7 +2,7 @@
   <img src="https://img.shields.io/badge/userscript-Violentmonkey%20%7C%20Tampermonkey-orange?style=flat-square" alt="userscript badge" />
   <img src="https://img.shields.io/badge/game-Upland-blueviolet?style=flat-square" alt="upland badge" />
   <img src="https://img.shields.io/github/license/WallCod/upland-bulk-list?style=flat-square" alt="license badge" />
-  <img src="https://img.shields.io/badge/version-1.2.0-brightgreen?style=flat-square" alt="version badge" />
+  <img src="https://img.shields.io/badge/version-1.3.0-brightgreen?style=flat-square" alt="version badge" />
 </p>
 
 <p align="center">
@@ -34,15 +34,16 @@ O gerenciador vai detectar o link automaticamente e abrir a tela de instalação
 
 ## ⚠️ Pré-requisitos (importante ler antes de usar)
 
-- **🌐 Idioma do jogo em inglês.** O script procura textos exatos como `"List for sale"`, `"List my map assets"`, `"Search"`. Se o Upland estiver em outro idioma para sua conta, o script não vai encontrar os botões e vai falhar.
-- **💰 Moeda configurada em UPX.** O script preenche o campo de preço assumindo que a moeda selecionada é UPX. Se estiver em USD, o valor será preenchido do mesmo jeito, mas na moeda errada — confira antes de rodar.
+- **🌐 Idioma do jogo em inglês.** O script procura textos exatos como `"List for sale"`, `"List my ..."`, `"Search"`. Se o Upland estiver em outro idioma para sua conta, o script não vai encontrar os botões e vai falhar.
+- **💰 Escolha a moeda no formulário.** O script suporta listar em UPX ou USD — selecione a opção certa no formulário antes de rodar, e ele troca o "OFFER TYPE" automaticamente na tela do jogo.
+- **🏬 Funciona em qualquer Showroom com o mesmo layout.** Testado em map assets, structure ornaments e outras categorias que seguem o mesmo fluxo de "select → preço → confirmar".
 - **🔗 Você entende que isso lista itens de verdade, na loja de verdade.** Não é uma simulação. Cada unidade listada gera uma transação real e irreversível pelo script (dá pra remover a listagem manualmente depois, como qualquer outra).
 
 ## ▶️ Como usar
 
-1. Vá até a Showroom no jogo, na tela inicial (antes de clicar em "List my map assets" — o script cuida disso).
+1. Vá até a Showroom no jogo, na tela inicial (antes de clicar em "List my..." — o script cuida disso).
 2. Clique no botão **"Upland Tools"** no canto inferior direito e escolha **"Bulk List"** no menu.
-3. Preencha o formulário: nome exato do item (como aparece na lista, ex: `BLUE TARGET MARKER`), preço por unidade em UPX, e quantidade a listar.
+3. Preencha o formulário: nome exato do item (como aparece na lista, ex: `BLUE TARGET MARKER`), moeda (UPX ou USD), preço por unidade, e quantidade a listar.
 4. O script verifica se o item existe na sua Showroom antes de começar, e mostra uma tela de confirmação com o total esperado (e um aviso se a quantidade disponível parecer menor que a pedida).
 5. Confirme, e o script roda sozinho, listando uma unidade por vez, com uma pausa entre cada uma para dar tempo da transação confirmar on-chain.
 6. Ao final, um resumo mostra quantas unidades foram listadas com sucesso e quantas foram puladas.

@@ -3,7 +3,7 @@
 // @namespace    https://github.com/WallCod/upland-bulk-list
 // @downloadURL  https://raw.githubusercontent.com/WallCod/upland-bulk-list/master/bulk-list-items.user.js
 // @updateURL    https://raw.githubusercontent.com/WallCod/upland-bulk-list/master/bulk-list-items.user.js
-// @version      1.2.0
+// @version      1.3.0
 // @description  Bulk-list identical items in the Showroom at the same price, one at a time, without clicking through each unit manually.
 // @author       WallCod
 // @match        https://play.upland.me/*
@@ -181,7 +181,28 @@
     input.dispatchEvent(new Event('input', { bubbles: true }));
   }
 
-  async function listOneItem(itemName, price, log, skipMints) {
+  // Troca a moeda do "OFFER TYPE" na tela de listagem para USD. O jogo
+  // abre a tela sempre em UPX por padrão; clicar no seletor abre um
+  // dropdown com as opções "UPX" e "$USD".
+  async function switchToUSD(log) {
+    const offerTypeBtn = await waitFor(() => findByText('button', 'UPX') || findByText('div', 'UPX'));
+    if (!offerTypeBtn) {
+      log('  [debug] currency selector (UPX) not found');
+      return false;
+    }
+    offerTypeBtn.click();
+    await sleep(STEP_DELAY_MS);
+    const usdOption = await waitFor(() => findByText('button', '$USD') || findByText('div', '$USD'));
+    if (!usdOption) {
+      log('  [debug] "$USD" option not found after opening currency selector');
+      return false;
+    }
+    usdOption.click();
+    await sleep(STEP_DELAY_MS);
+    return true;
+  }
+
+  async function listOneItem(itemName, currency, price, log, skipMints) {
     // 0. Garantir que a lista de itens está aberta (pode estar na tela
     // inicial da Showroom se este não é o primeiro item da rodada). A
     // navegação de volta para a Showroom após fechar a tela de sucesso nem
@@ -210,7 +231,17 @@
     found.btn.click();
     await sleep(STEP_DELAY_MS);
 
-    // 1. Esperar o campo ASK PRICE aparecer e preencher
+    // 1. Se o preço for em USD, trocar o "OFFER TYPE" (o jogo sempre abre
+    // a tela em UPX por padrão) antes de preencher o valor.
+    if (currency === 'USD') {
+      log('  [debug] switching offer type to $USD...');
+      const switched = await switchToUSD(log);
+      if (!switched) {
+        return { ok: false, reason: 'currency-switch-failed', mintId };
+      }
+    }
+
+    // 2. Esperar o campo ASK PRICE aparecer e preencher
     const priceInput = await waitFor(() => queryVisible('input[placeholder="ASK PRICE"]'));
     if (!priceInput) {
       log(`  [debug] price-input-not-found. Current URL: ${location.href}`);
@@ -220,7 +251,7 @@
     setNativeValue(priceInput, String(price));
     await sleep(STEP_DELAY_MS);
 
-    // 2. Clicar em "List for sale"
+    // 3. Clicar em "List for sale"
     const listBtn = await waitFor(() => findByText('button', 'List for sale'));
     if (!listBtn) {
       log(`  [debug] list-button-not-found. Current URL: ${location.href}`);
@@ -230,7 +261,7 @@
     listBtn.click();
     await sleep(STEP_DELAY_MS);
 
-    // 3. Modal de confirmação -> botão verde (aria-label="success"). Reseta
+    // 4. Modal de confirmação -> botão verde (aria-label="success"). Reseta
     // o resultado da última submissão antes de confirmar, para capturar
     // especificamente a resposta desta tentativa.
     lastSubmitResult = null;
@@ -321,9 +352,9 @@
   // Motivos de falha que não valem retry (não são erro transitório de
   // servidor) — se acontecerem, a rodada inteira para, pois indicam que o
   // script perdeu o rastro da UI, não que um item específico está com problema.
-  const FATAL_REASONS = new Set(['item-not-found', 'price-input-not-found', 'list-button-not-found', 'confirm-button-not-found', 'close-button-not-found']);
+  const FATAL_REASONS = new Set(['item-not-found', 'currency-switch-failed', 'price-input-not-found', 'list-button-not-found', 'confirm-button-not-found', 'close-button-not-found']);
 
-  async function runBulkListing(itemName, price, quantity, log) {
+  async function runBulkListing(itemName, currency, price, quantity, log) {
     let done = 0;
     let skipped = 0;
     // MINT#s de unidades que já falharam persistentemente — evita que a
@@ -333,8 +364,8 @@
       let result;
       for (let attempt = 0; attempt <= MAX_RETRIES_PER_ITEM; attempt++) {
         const label = attempt === 0 ? `[${i + 1}/${quantity}]` : `[${i + 1}/${quantity}] (attempt ${attempt + 1})`;
-        log(`${label} Listing "${itemName}" for ${price} UPX...`);
-        result = await listOneItem(itemName, price, log, skipMints);
+        log(`${label} Listing "${itemName}" for ${price} ${currency}...`);
+        result = await listOneItem(itemName, currency, price, log, skipMints);
         // "submit-rejected" costuma ser erro transitório de servidor (ex: 500,
         // possível rate limit) — vale tentar de novo, esperando mais a cada
         // vez, antes de desistir desta unidade específica.
@@ -423,6 +454,25 @@
     });
     wrap.appendChild(input);
     return { wrap, input };
+  }
+
+  function modalSelect(labelText, options) {
+    const wrap = document.createElement('label');
+    Object.assign(wrap.style, { display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '14px', fontSize: '12px', color: '#9aa0ac' });
+    wrap.textContent = labelText;
+    const select = document.createElement('select');
+    Object.assign(select.style, {
+      background: '#0f1117', color: '#e4e6eb', border: '1px solid #2a2e37',
+      borderRadius: '6px', padding: '10px', fontSize: '14px', marginTop: '2px',
+    });
+    options.forEach(([value, text]) => {
+      const opt = document.createElement('option');
+      opt.value = value;
+      opt.textContent = text;
+      select.appendChild(opt);
+    });
+    wrap.appendChild(select);
+    return { wrap, input: select };
   }
 
   function modalTextarea(labelText, placeholder, rows) {
@@ -516,7 +566,8 @@
       Object.assign(h.style, { margin: '0 0 16px', fontSize: '16px' });
 
       const nameField = modalField('Exact item name', 'e.g. BLUE TARGET MARKER');
-      const priceField = modalField('Price per unit (UPX)', 'e.g. 200', 'numeric');
+      const currencyField = modalSelect('Currency', [['UPX', 'UPX'], ['USD', '$USD']]);
+      const priceField = modalField('Price per unit', 'e.g. 200', 'numeric');
       const quantityField = modalField('Quantity to list', 'e.g. 10', 'numeric');
       const errorMsg = document.createElement('div');
       Object.assign(errorMsg.style, { color: '#f87171', fontSize: '12px', marginBottom: '12px', display: 'none' });
@@ -528,6 +579,7 @@
       cancelBtn.addEventListener('click', () => { overlay.remove(); resolve(null); });
       nextBtn.addEventListener('click', () => {
         const itemName = nameField.input.value.trim();
+        const currency = currencyField.input.value;
         const price = Number(priceField.input.value);
         const quantity = Number(quantityField.input.value);
         if (!itemName || !priceField.input.value || isNaN(price) || price <= 0 || !quantityField.input.value || isNaN(quantity) || quantity <= 0) {
@@ -536,11 +588,11 @@
           return;
         }
         overlay.remove();
-        resolve({ itemName, price, quantity });
+        resolve({ itemName, currency, price, quantity });
       });
       btnRow.append(cancelBtn, nextBtn);
 
-      box.append(h, nameField.wrap, priceField.wrap, quantityField.wrap, errorMsg, btnRow);
+      box.append(h, nameField.wrap, currencyField.wrap, priceField.wrap, quantityField.wrap, errorMsg, btnRow);
       nameField.input.focus();
     });
   }
@@ -717,7 +769,7 @@
       menu.style.display = 'none';
       const form = await showListingForm();
       if (!form) return;
-      const { itemName, price, quantity } = form;
+      const { itemName, currency, price, quantity } = form;
       const total = price * quantity;
 
       menuBtn.disabled = true;
@@ -745,9 +797,10 @@
 
       const confirmed = await showConfirm('Confirm before starting', [
         ['Item', itemName],
-        ['Unit price', `${price} UPX`],
+        ['Currency', currency],
+        ['Unit price', `${price} ${currency}`],
         ['Quantity', String(quantity)],
-        ['Expected total', `${total.toLocaleString('en-US')} UPX`],
+        ['Expected total', `${total.toLocaleString('en-US')} ${currency}`],
       ], warningLine);
 
       if (!confirmed) {
@@ -760,7 +813,7 @@
       clearStatusLines();
       menuBtn.textContent = 'Listing...';
       try {
-        const { done, skipped } = await runBulkListing(itemName, price, quantity, log);
+        const { done, skipped } = await runBulkListing(itemName, currency, price, quantity, log);
         await showMessage(
           'Round complete',
           `${done} of ${quantity} units listed successfully.` + (skipped ? `\n${skipped} skipped due to persistent server failure.` : '')
