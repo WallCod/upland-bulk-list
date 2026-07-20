@@ -3,7 +3,7 @@
 // @namespace    https://github.com/WallCod/upland-bulk-list
 // @downloadURL  https://raw.githubusercontent.com/WallCod/upland-bulk-list/master/bulk-list-items.user.js
 // @updateURL    https://raw.githubusercontent.com/WallCod/upland-bulk-list/master/bulk-list-items.user.js
-// @version      1.4.0
+// @version      1.4.1
 // @description  Bulk-list identical items in the Showroom at the same price, one at a time, without clicking through each unit manually.
 // @author       WallCod
 // @match        https://play.upland.me/*
@@ -34,7 +34,7 @@
   // rápido demais, o item aparece "fantasma" (ainda visível mas já vendido)
   // e o clique nele falha silenciosamente. Esperamos esse tempo antes de
   // reabrir a lista ("List my ...") para o próximo item.
-  const CONFIRMATION_DELAY_MS = 12000;
+  const CONFIRMATION_DELAY_MS = 10000;
 
   const sleep = ms => new Promise(r => setTimeout(r, ms));
 
