@@ -2,7 +2,7 @@
   <img src="https://img.shields.io/badge/userscript-Violentmonkey%20%7C%20Tampermonkey-orange?style=flat-square" alt="userscript badge" />
   <img src="https://img.shields.io/badge/game-Upland-blueviolet?style=flat-square" alt="upland badge" />
   <img src="https://img.shields.io/github/license/WallCod/upland-bulk-list?style=flat-square" alt="license badge" />
-  <img src="https://img.shields.io/badge/version-1.3.2-brightgreen?style=flat-square" alt="version badge" />
+  <img src="https://img.shields.io/badge/version-1.4.0-brightgreen?style=flat-square" alt="version badge" />
 </p>
 
 <p align="center">

@@ -3,7 +3,7 @@
 // @namespace    https://github.com/WallCod/upland-bulk-list
 // @downloadURL  https://raw.githubusercontent.com/WallCod/upland-bulk-list/master/bulk-list-items.user.js
 // @updateURL    https://raw.githubusercontent.com/WallCod/upland-bulk-list/master/bulk-list-items.user.js
-// @version      1.3.2
+// @version      1.4.0
 // @description  Bulk-list identical items in the Showroom at the same price, one at a time, without clicking through each unit manually.
 // @author       WallCod
 // @match        https://play.upland.me/*
@@ -90,12 +90,14 @@
   }
 
   // Diferentes Showrooms (map assets, structure ornaments, NFL, futebol,
-  // etc.) usam o mesmo botão de abrir a lista, mas com texto diferente:
-  // sempre "List my <categoria>". Casa pelo prefixo em vez de texto exato.
+  // seeds, etc.) usam o mesmo botão de abrir a lista, mas com texto
+  // diferente: "List my <categoria>" ou "List your <categoria>". Casa
+  // pelo prefixo em vez de texto exato.
   function findListMyButton(selector) {
-    return [...document.querySelectorAll(selector)].find(
-      el => el.textContent.trim().toLowerCase().startsWith('list my ') && isVisible(el)
-    );
+    return [...document.querySelectorAll(selector)].find(el => {
+      const text = el.textContent.trim().toLowerCase();
+      return (text.startsWith('list my ') || text.startsWith('list your ')) && isVisible(el);
+    });
   }
 
   function queryVisible(selector) {
