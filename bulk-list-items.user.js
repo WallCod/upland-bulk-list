@@ -3,7 +3,7 @@
 // @namespace    https://github.com/WallCod/upland-bulk-list
 // @downloadURL  https://raw.githubusercontent.com/WallCod/upland-bulk-list/master/bulk-list-items.user.js
 // @updateURL    https://raw.githubusercontent.com/WallCod/upland-bulk-list/master/bulk-list-items.user.js
-// @version      1.3.0
+// @version      1.3.1
 // @description  Bulk-list identical items in the Showroom at the same price, one at a time, without clicking through each unit manually.
 // @author       WallCod
 // @match        https://play.upland.me/*
@@ -184,15 +184,21 @@
   // Troca a moeda do "OFFER TYPE" na tela de listagem para USD. O jogo
   // abre a tela sempre em UPX por padrão; clicar no seletor abre um
   // dropdown com as opções "UPX" e "$USD".
+  // O seletor de moeda é um react-select (biblioteca padrão de dropdown do
+  // React) — precisa clicar no elemento ".react-select__control" para abrir
+  // o menu, não no texto em si (que fica num <div> sem handler de clique).
   async function switchToUSD(log) {
-    const offerTypeBtn = await waitFor(() => findByText('button', 'UPX') || findByText('div', 'UPX'));
-    if (!offerTypeBtn) {
-      log('  [debug] currency selector (UPX) not found');
+    const control = await waitFor(() => queryVisible('.react-select__control'));
+    if (!control) {
+      log('  [debug] currency selector (react-select__control) not found');
       return false;
     }
-    offerTypeBtn.click();
+    control.click();
     await sleep(STEP_DELAY_MS);
-    const usdOption = await waitFor(() => findByText('button', '$USD') || findByText('div', '$USD'));
+    const usdOption = await waitFor(() => {
+      const options = [...document.querySelectorAll('.react-select__option')].filter(isVisible);
+      return options.find(el => el.textContent.trim().toLowerCase() === '$usd') || null;
+    });
     if (!usdOption) {
       log('  [debug] "$USD" option not found after opening currency selector');
       return false;
