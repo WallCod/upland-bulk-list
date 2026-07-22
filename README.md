@@ -34,14 +34,14 @@ O gerenciador vai detectar o link automaticamente e abrir a tela de instalação
 
 ## ⚠️ Pré-requisitos (importante ler antes de usar)
 
-- **🌐 Idioma do jogo em inglês.** O script procura textos exatos como `"List for sale"`, `"List my ..."`, `"Search"`. Se o Upland estiver em outro idioma para sua conta, o script não vai encontrar os botões e vai falhar.
+- **🌐 Idioma do jogo em inglês.** O script procura textos exatos como `"List for sale"`, `"List my ..."`/`"List your ..."`, `"Search"`. Se o Upland estiver em outro idioma para sua conta, o script não vai encontrar os botões e vai falhar.
 - **💰 Escolha a moeda no formulário.** O script suporta listar em UPX ou USD — selecione a opção certa no formulário antes de rodar, e ele troca o "OFFER TYPE" automaticamente na tela do jogo.
-- **🏬 Funciona em qualquer Showroom com o mesmo layout.** Testado em map assets, structure ornaments e outras categorias que seguem o mesmo fluxo de "select → preço → confirmar".
+- **🏬 Funciona em qualquer Showroom com o mesmo layout.** Testado em map assets, structure ornaments, football legits, NFL e seeds — qualquer categoria que siga o mesmo fluxo de "select → preço → confirmar" deve funcionar.
 - **🔗 Você entende que isso lista itens de verdade, na loja de verdade.** Não é uma simulação. Cada unidade listada gera uma transação real e irreversível pelo script (dá pra remover a listagem manualmente depois, como qualquer outra).
 
 ## ▶️ Como usar
 
-1. Vá até a Showroom no jogo, na tela inicial (antes de clicar em "List my..." — o script cuida disso).
+1. Vá até a Showroom no jogo, na tela inicial (antes de clicar em "List my..."/"List your..." — o script cuida disso).
 2. Clique no botão **"Upland Tools"** no canto inferior direito e escolha **"Bulk List"** no menu.
 3. Preencha o formulário: nome exato do item (como aparece na lista, ex: `BLUE TARGET MARKER`), moeda (UPX ou USD), preço por unidade, e quantidade a listar.
 4. O script verifica se o item existe na sua Showroom antes de começar, e mostra uma tela de confirmação com o total esperado (e um aviso se a quantidade disponível parecer menor que a pedida).
